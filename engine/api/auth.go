@@ -37,7 +37,15 @@ func (api *API) getAuthDriversHandler() service.Handler {
 
 func (api *API) getAuthScopesHandler() service.Handler {
 	return func(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
-		return service.WriteJSON(w, sdk.AuthConsumerScopes, http.StatusOK)
+		/*res := make([]sdk.AuthConsumerScopeDetail, 0, len(sdk.AuthConsumerScopes))
+
+		for i := range sdk.AuthConsumerScopes {
+			res[i].Scope = sdk.AuthConsumerScopes[i]
+    }*/
+    
+    res := api.Router.GetScopeDetails()
+
+		return service.WriteJSON(w, res, http.StatusOK)
 	}
 }
 

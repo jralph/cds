@@ -182,6 +182,62 @@ func DefaultHeaders() map[string]string {
 	}
 }
 
+func (r *Router) GetScopeDetails() []sdk.AuthConsumerScopeDetail {
+	// create temporary map of scopes, for each scope we will create a map of routes with methods.
+	m := make(map[sdk.AuthConsumerScope]map[string]map[string]struct{})
+
+	for uri, cfg := range r.mapRouterConfigs {
+		if len(cfg.Config) == 0 {
+			continue
+		}
+
+		methods := make([]string, 0, len(cfg.Config))
+		var scopes []sdk.AuthConsumerScope
+		for method, handler := range cfg.Config {
+			// Take scopes from the first handler as every handlers should have the same scopes
+			if scopes == nil {
+				scopes = handler.AllowedScopes
+			}
+			methods = append(methods, method)
+		}
+
+		for i := range scopes {
+			if _, ok := m[scopes[i]]; !ok {
+				m[scopes[i]] = make(map[string]map[string]struct{})
+			}
+			if _, ok := m[scopes[i]][uri]; !ok {
+				m[scopes[i]][uri] = make(map[string]struct{})
+			}
+			for j := range methods {
+				m[scopes[i]][uri][methods[j]] = struct{}{}
+			}
+		}
+	}
+
+	// return scope details
+	details := make([]sdk.AuthConsumerScopeDetail, len(sdk.AuthConsumerScopes))
+	for i, scope := range sdk.AuthConsumerScopes {
+		var endpoints []sdk.AuthConsumerScopeEndpoint
+		for uri, mMethods := range m[scope] {
+			methods := make([]string, 0, len(mMethods))
+			for k := range mMethods {
+				methods = append(methods, k)
+			}
+			endpoints = append(endpoints, sdk.AuthConsumerScopeEndpoint{
+				Route:   uri,
+				Methods: methods,
+			})
+		}
+
+		details[i] = sdk.AuthConsumerScopeDetail{
+			Scope:     scope,
+			Endpoints: endpoints,
+		}
+  }
+  
+  return details
+}
+
 // Handle adds all handler for their specific verb in gorilla router for given uri
 func (r *Router) Handle(uri string, scope HandlerScope, handlers ...*service.HandlerConfig) {
 	uri = r.Prefix + uri

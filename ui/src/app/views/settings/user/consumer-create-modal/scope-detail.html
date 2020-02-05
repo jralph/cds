@@ -1,0 +1,76 @@
+<div class="ui grid detail" *ngIf="scopeDetail">
+    <div class="ui row scope">
+        <div class="ui eight wide column">
+            {{scopeDetail.scope}}
+        </div>
+        <div class="ui eight wide column right aligned">
+            <a class="pointing advanced" (click)="clickAdvanced()">{{'common_advanced' | translate}}</a>
+            <sui-checkbox class="field" [ngModel]="allSelected" (ngModelChange)="changeSelectAll($event)">
+            </sui-checkbox>
+        </div>
+    </div>
+    <ng-container *ngIf="advancedOpen">
+        <div *ngFor="let endpoint of scopeDetail.endpoints" class="ui row route">
+            <div class="ui eight wide column">
+                {{endpoint.route}}
+            </div>
+            <div class="ui eight wide column">
+                <div class="ui form">
+                    <div class="ui fields methods">
+                        <ng-container
+                            *ngIf="selectedRouteMethods[scopeDetail.scope+'-'+endpoint.route].GET != null; then enabledGET; else disabledGET">
+                        </ng-container>
+                        <ng-template #enabledGET>
+                            <sui-checkbox class="field"
+                                [ngModel]="selectedRouteMethods[scopeDetail.scope+'-'+endpoint.route].GET">GET
+                            </sui-checkbox>
+                        </ng-template>
+                        <ng-template #disabledGET>
+                            <sui-checkbox class="field" [isDisabled]="true">GET</sui-checkbox>
+                        </ng-template>
+
+                        <ng-container
+                            *ngIf="selectedRouteMethods[scopeDetail.scope+'-'+endpoint.route].POST != null; then enabledPOST; else disabledPOST">
+                        </ng-container>
+                        <ng-template #enabledPOST>
+                            <sui-checkbox class="field"
+                                [ngModel]="selectedRouteMethods[scopeDetail.scope+'-'+endpoint.route].POST">POST
+                            </sui-checkbox>
+                        </ng-template>
+                        <ng-template #disabledPOST>
+                            <sui-checkbox class="field" [isDisabled]="true">POST</sui-checkbox>
+                        </ng-template>
+
+                        <ng-container
+                            *ngIf="selectedRouteMethods[scopeDetail.scope+'-'+endpoint.route].PUT != null; then enabledPUT; else disabledPUT">
+                        </ng-container>
+                        <ng-template #enabledPUT>
+                            <sui-checkbox class="field"
+                                [ngModel]="selectedRouteMethods[scopeDetail.scope+'-'+endpoint.route].PUT">PUT
+                            </sui-checkbox>
+                        </ng-template>
+                        <ng-template #disabledPUT>
+                            <sui-checkbox class="field" [isDisabled]="true">PUT</sui-checkbox>
+                        </ng-template>
+
+                        <ng-container
+                            *ngIf="selectedRouteMethods[scopeDetail.scope+'-'+endpoint.route].DELETE != null; then enabledDELETE; else disabledDELETE">
+                        </ng-container>
+                        <ng-template #enabledDELETE>
+                            <sui-checkbox class="field"
+                                [ngModel]="selectedRouteMethods[scopeDetail.scope+'-'+endpoint.route].DELETE">DELETE
+                            </sui-checkbox>
+                        </ng-template>
+                        <ng-template #disabledDELETE>
+                            <sui-checkbox class="field" [isDisabled]="true">DELETE</sui-checkbox>
+                        </ng-template>
+
+                        <sui-checkbox class="field" [ngModel]="allMethodSelected">
+                            {{'common_all' | translate}}
+                        </sui-checkbox>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+</div>
